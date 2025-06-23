@@ -385,42 +385,31 @@ def train_models_core(_X, _y, _df_encoded):
     }
 
     # Stage 1: Initial grid search
-    # ...existing code...
-initial_param_grids = {
-    "Random Forest": {
-        'classifier__n_estimators': [100],  # 只用一个值
-        'classifier__max_depth': [None],
-        'classifier__min_samples_split': [2]
-    },
-    "Logistic Regression": {
-        'classifier__C': [1],
-        'classifier__penalty': ['l1'],
-        'classifier__solver': ['liblinear']
-    },
-    "SVM": {
-        'classifier__C': [1],
-        'classifier__kernel': ['rbf']
-    },
-    "Decision Tree": {
-        'classifier__max_depth': [5],
-        'classifier__min_samples_split': [2]
-    },
-    "XGBoost": {
-        'classifier__n_estimators': [100],
-        'classifier__max_depth': [3],
-        'classifier__learning_rate': [0.1]
+    initial_param_grids = {
+        "Random Forest": {
+            'classifier__n_estimators': [100],  # 只用一个值
+            'classifier__max_depth': [None],
+            'classifier__min_samples_split': [2]
+        },
+        "Logistic Regression": {
+            'classifier__C': [1],
+            'classifier__penalty': ['l1'],
+            'classifier__solver': ['liblinear']
+        },
+        "SVM": {
+            'classifier__C': [1],
+            'classifier__kernel': ['rbf']
+        },
+        "Decision Tree": {
+            'classifier__max_depth': [5],
+            'classifier__min_samples_split': [2]
+        },
+        "XGBoost": {
+            'classifier__n_estimators': [100],
+            'classifier__max_depth': [3],
+            'classifier__learning_rate': [0.1]
+        }
     }
-}
-
-
-grid_search = GridSearchCV(pipeline, initial_param_grids[name], cv=3, scoring='accuracy', n_jobs=1)
-
-train_scores, val_scores = validation_curve(
-    base_pipeline, X_train, y_train,
-    param_name=param_to_tune, param_range=param_range,
-    cv=3, scoring='accuracy', n_jobs=1
-)
-
 
     initial_results = {}
     initial_best_params = {}
