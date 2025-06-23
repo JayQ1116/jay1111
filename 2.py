@@ -353,7 +353,7 @@ def train_models_core(_X, _y, _df_encoded):
     # Part 1: Initial Random Forest Analysis
     # Use all features
     X_train_all, X_test_all, y_train_all, y_test_all = train_test_split(
-        X, y, test_size=0.3, random_state=42, stratify=y
+        X, y, test_size=0.9, random_state=42, stratify=y
     )
 
     # Train Random Forest
@@ -372,7 +372,7 @@ def train_models_core(_X, _y, _df_encoded):
     # Part 2: Multi-model optimization with selected features
     X_selected = df_encoded[top_20_features]
     X_train, X_test, y_train, y_test = train_test_split(
-        X_selected, y, test_size=0.3, random_state=42, stratify=y
+        X_selected, y, test_size=0.9, random_state=42, stratify=y
     )
 
     # Define models
@@ -387,7 +387,7 @@ def train_models_core(_X, _y, _df_encoded):
     # Stage 1: Initial grid search
     initial_param_grids = {
         "Random Forest": {
-            'classifier__n_estimators': [100],  # 只用一个值
+            'classifier__n_estimators': [100],
             'classifier__max_depth': [None],
             'classifier__min_samples_split': [2]
         },
@@ -427,7 +427,7 @@ def train_models_core(_X, _y, _df_encoded):
                 ('classifier', model)
             ])
 
-        grid_search = GridSearchCV(pipeline, initial_param_grids[name], cv=3, scoring='accuracy', n_jobs=1)
+        grid_search = GridSearchCV(pipeline, initial_param_grids[name], cv=2, scoring='accuracy', n_jobs=1)
         grid_search.fit(X_train, y_train)
 
         initial_best_params[name] = grid_search.best_params_
@@ -489,7 +489,7 @@ def train_models_core(_X, _y, _df_encoded):
         train_scores, val_scores = validation_curve(
             base_pipeline, X_train, y_train,
             param_name=param_to_tune, param_range=param_range,
-            cv=3, scoring='accuracy', n_jobs=1
+            cv=2, scoring='accuracy', n_jobs=1
         )
 
         val_mean = np.mean(val_scores, axis=1)
