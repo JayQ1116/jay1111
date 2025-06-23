@@ -385,31 +385,42 @@ def train_models_core(_X, _y, _df_encoded):
     }
 
     # Stage 1: Initial grid search
-    initial_param_grids = {
-        "Random Forest": {
-            'classifier__n_estimators': [50, 100, 200],
-            'classifier__max_depth': [None, 10, 20],
-            'classifier__min_samples_split': [2, 5]
-        },
-        "Logistic Regression": {
-            'classifier__C': [0.1, 1, 10],
-            'classifier__penalty': ['l1'],
-            'classifier__solver': ['liblinear']
-        },
-        "SVM": {
-            'classifier__C': [0.1, 1, 10],
-            'classifier__kernel': ['rbf', 'linear']
-        },
-        "Decision Tree": {
-            'classifier__max_depth': [5, 10, 20, None],
-            'classifier__min_samples_split': [2, 5, 10]
-        },
-        "XGBoost": {
-            'classifier__n_estimators': [50, 100, 200],
-            'classifier__max_depth': [3, 6, 9],
-            'classifier__learning_rate': [0.01, 0.1, 0.2]
-        }
+    # ...existing code...
+initial_param_grids = {
+    "Random Forest": {
+        'classifier__n_estimators': [100],  # 只用一个值
+        'classifier__max_depth': [None],
+        'classifier__min_samples_split': [2]
+    },
+    "Logistic Regression": {
+        'classifier__C': [1],
+        'classifier__penalty': ['l1'],
+        'classifier__solver': ['liblinear']
+    },
+    "SVM": {
+        'classifier__C': [1],
+        'classifier__kernel': ['rbf']
+    },
+    "Decision Tree": {
+        'classifier__max_depth': [5],
+        'classifier__min_samples_split': [2]
+    },
+    "XGBoost": {
+        'classifier__n_estimators': [100],
+        'classifier__max_depth': [3],
+        'classifier__learning_rate': [0.1]
     }
+}
+
+
+grid_search = GridSearchCV(pipeline, initial_param_grids[name], cv=3, scoring='accuracy', n_jobs=1)
+
+train_scores, val_scores = validation_curve(
+    base_pipeline, X_train, y_train,
+    param_name=param_to_tune, param_range=param_range,
+    cv=3, scoring='accuracy', n_jobs=1
+)
+
 
     initial_results = {}
     initial_best_params = {}
@@ -427,7 +438,7 @@ def train_models_core(_X, _y, _df_encoded):
                 ('classifier', model)
             ])
 
-        grid_search = GridSearchCV(pipeline, initial_param_grids[name], cv=5, scoring='accuracy', n_jobs=1)
+        grid_search = GridSearchCV(pipeline, initial_param_grids[name], cv=3, scoring='accuracy', n_jobs=1)
         grid_search.fit(X_train, y_train)
 
         initial_best_params[name] = grid_search.best_params_
@@ -489,7 +500,7 @@ def train_models_core(_X, _y, _df_encoded):
         train_scores, val_scores = validation_curve(
             base_pipeline, X_train, y_train,
             param_name=param_to_tune, param_range=param_range,
-            cv=5, scoring='accuracy', n_jobs=1
+            cv=3, scoring='accuracy', n_jobs=1
         )
 
         val_mean = np.mean(val_scores, axis=1)
